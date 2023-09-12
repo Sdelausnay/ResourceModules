@@ -111,7 +111,6 @@ module testDeployment '../../main.bicep' = {
     diagnosticWorkspaceId: diagnosticDependencies.outputs.logAnalyticsWorkspaceResourceId
     diagnosticEventHubAuthorizationRuleId: diagnosticDependencies.outputs.eventHubAuthorizationRuleId
     diagnosticEventHubName: diagnosticDependencies.outputs.eventHubNamespaceEventHubName
-    diagnosticLogsRetentionInDays: 7
     disablePasswordAuthentication: true
     encryptionAtHost: false
     extensionCustomScriptConfig: {
@@ -188,6 +187,7 @@ module testDeployment '../../main.bicep' = {
     vmNamePrefix: 'vmsslinvm'
     vmPriority: 'Regular'
     tags: {
+      'hidden-title': 'This is visible in the resource name'
       Environment: 'Non-Prod'
       Role: 'DeploymentValidation'
     }

@@ -72,8 +72,13 @@ module testDeployment '../../main.bicep' = {
   params: {
     enableDefaultTelemetry: enableDefaultTelemetry
     name: '${namePrefix}${serviceShort}001'
-    administratorLogin: 'adminUserName'
-    administratorLoginPassword: password
+    administrators: [
+      {
+        objectId: nestedDependencies.outputs.managedIdentityClientId
+        principalName: nestedDependencies.outputs.managedIdentityName
+        principalType: 'ServicePrincipal'
+      }
+    ]
     skuName: 'Standard_D2s_v3'
     tier: 'GeneralPurpose'
     availabilityZone: '1'
@@ -99,7 +104,6 @@ module testDeployment '../../main.bicep' = {
     diagnosticWorkspaceId: diagnosticDependencies.outputs.logAnalyticsWorkspaceResourceId
     diagnosticEventHubAuthorizationRuleId: diagnosticDependencies.outputs.eventHubAuthorizationRuleId
     diagnosticEventHubName: diagnosticDependencies.outputs.eventHubNamespaceEventHubName
-    diagnosticLogsRetentionInDays: 7
     firewallRules: [
       {
         endIpAddress: '0.0.0.0'
@@ -129,6 +133,7 @@ module testDeployment '../../main.bicep' = {
       '${nestedDependencies.outputs.managedIdentityResourceId}': {}
     }
     tags: {
+      'hidden-title': 'This is visible in the resource name'
       Environment: 'Non-Prod'
       Role: 'DeploymentValidation'
     }

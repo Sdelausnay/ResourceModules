@@ -21,8 +21,8 @@ This module deploys a Virtual Machine with one or multiple NICs and optionally o
 | `Microsoft.Compute/virtualMachines` | [2022-11-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Compute/2022-11-01/virtualMachines) |
 | `Microsoft.Compute/virtualMachines/extensions` | [2022-11-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Compute/2022-11-01/virtualMachines/extensions) |
 | `Microsoft.Insights/diagnosticSettings` | [2021-05-01-preview](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Insights/2021-05-01-preview/diagnosticSettings) |
-| `Microsoft.Network/networkInterfaces` | [2022-07-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2022-07-01/networkInterfaces) |
-| `Microsoft.Network/publicIPAddresses` | [2022-07-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2022-07-01/publicIPAddresses) |
+| `Microsoft.Network/networkInterfaces` | [2023-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2023-04-01/networkInterfaces) |
+| `Microsoft.Network/publicIPAddresses` | [2023-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2023-04-01/publicIPAddresses) |
 | `Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems` | [2023-01-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.RecoveryServices/2023-01-01/vaults/backupFabrics/protectionContainers/protectedItems) |
 
 ## Parameters
@@ -61,7 +61,6 @@ This module deploys a Virtual Machine with one or multiple NICs and optionally o
 | `dedicatedHostId` | string | `''` |  | Specifies resource ID about the dedicated host that the virtual machine resides in. |
 | `diagnosticEventHubAuthorizationRuleId` | string | `''` |  | Resource ID of the diagnostic event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to. |
 | `diagnosticEventHubName` | string | `''` |  | Name of the diagnostic event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category. |
-| `diagnosticLogsRetentionInDays` | int | `365` |  | Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely. |
 | `diagnosticStorageAccountId` | string | `''` |  | Resource ID of the diagnostic storage account. |
 | `diagnosticWorkspaceId` | string | `''` |  | Resource ID of the diagnostic log analytics workspace. |
 | `disablePasswordAuthentication` | bool | `False` |  | Specifies whether password authentication should be disabled. |
@@ -1137,7 +1136,6 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
     ]
     diagnosticEventHubAuthorizationRuleId: '<diagnosticEventHubAuthorizationRuleId>'
     diagnosticEventHubName: '<diagnosticEventHubName>'
-    diagnosticLogsRetentionInDays: 7
     diagnosticStorageAccountId: '<diagnosticStorageAccountId>'
     diagnosticWorkspaceId: '<diagnosticWorkspaceId>'
     disablePasswordAuthentication: true
@@ -1148,6 +1146,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
       enabled: true
       tags: {
         Environment: 'Non-Prod'
+        'hidden-title': 'This is visible in the resource name'
         Role: 'DeploymentValidation'
       }
     }
@@ -1165,6 +1164,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
       }
       tags: {
         Environment: 'Non-Prod'
+        'hidden-title': 'This is visible in the resource name'
         Role: 'DeploymentValidation'
       }
     }
@@ -1178,6 +1178,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
       ]
       tags: {
         Environment: 'Non-Prod'
+        'hidden-title': 'This is visible in the resource name'
         Role: 'DeploymentValidation'
       }
     }
@@ -1188,6 +1189,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
       enabled: true
       tags: {
         Environment: 'Non-Prod'
+        'hidden-title': 'This is visible in the resource name'
         Role: 'DeploymentValidation'
       }
     }
@@ -1195,6 +1197,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
       enabled: false
       tags: {
         Environment: 'Non-Prod'
+        'hidden-title': 'This is visible in the resource name'
         Role: 'DeploymentValidation'
       }
     }
@@ -1202,6 +1205,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
       enabled: true
       tags: {
         Environment: 'Non-Prod'
+        'hidden-title': 'This is visible in the resource name'
         Role: 'DeploymentValidation'
       }
     }
@@ -1209,6 +1213,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
       enabled: true
       tags: {
         Environment: 'Non-Prod'
+        'hidden-title': 'This is visible in the resource name'
         Role: 'DeploymentValidation'
       }
     }
@@ -1235,6 +1240,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
     systemAssignedIdentity: true
     tags: {
       Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
     }
     userAssignedIdentities: {
@@ -1374,9 +1380,6 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
     "diagnosticEventHubName": {
       "value": "<diagnosticEventHubName>"
     },
-    "diagnosticLogsRetentionInDays": {
-      "value": 7
-    },
     "diagnosticStorageAccountId": {
       "value": "<diagnosticStorageAccountId>"
     },
@@ -1400,6 +1403,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         "enabled": true,
         "tags": {
           "Environment": "Non-Prod",
+          "hidden-title": "This is visible in the resource name",
           "Role": "DeploymentValidation"
         }
       }
@@ -1419,6 +1423,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         },
         "tags": {
           "Environment": "Non-Prod",
+          "hidden-title": "This is visible in the resource name",
           "Role": "DeploymentValidation"
         }
       }
@@ -1434,6 +1439,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         ],
         "tags": {
           "Environment": "Non-Prod",
+          "hidden-title": "This is visible in the resource name",
           "Role": "DeploymentValidation"
         }
       }
@@ -1448,6 +1454,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         "enabled": true,
         "tags": {
           "Environment": "Non-Prod",
+          "hidden-title": "This is visible in the resource name",
           "Role": "DeploymentValidation"
         }
       }
@@ -1457,6 +1464,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         "enabled": false,
         "tags": {
           "Environment": "Non-Prod",
+          "hidden-title": "This is visible in the resource name",
           "Role": "DeploymentValidation"
         }
       }
@@ -1466,6 +1474,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         "enabled": true,
         "tags": {
           "Environment": "Non-Prod",
+          "hidden-title": "This is visible in the resource name",
           "Role": "DeploymentValidation"
         }
       }
@@ -1475,6 +1484,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         "enabled": true,
         "tags": {
           "Environment": "Non-Prod",
+          "hidden-title": "This is visible in the resource name",
           "Role": "DeploymentValidation"
         }
       }
@@ -1519,6 +1529,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
     "tags": {
       "value": {
         "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
       }
     },
@@ -1561,6 +1572,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
               publicIpNameSuffix: '-pip-01'
               tags: {
                 Environment: 'Non-Prod'
+                'hidden-title': 'This is visible in the resource name'
                 Role: 'DeploymentValidation'
               }
             }
@@ -1570,6 +1582,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         nicSuffix: '-nic-01'
         tags: {
           Environment: 'Non-Prod'
+          'hidden-title': 'This is visible in the resource name'
           Role: 'DeploymentValidation'
         }
       }
@@ -1596,6 +1609,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
     ]
     tags: {
       Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
     }
   }
@@ -1636,6 +1650,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
                 "publicIpNameSuffix": "-pip-01",
                 "tags": {
                   "Environment": "Non-Prod",
+                  "hidden-title": "This is visible in the resource name",
                   "Role": "DeploymentValidation"
                 }
               },
@@ -1645,6 +1660,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
           "nicSuffix": "-nic-01",
           "tags": {
             "Environment": "Non-Prod",
+            "hidden-title": "This is visible in the resource name",
             "Role": "DeploymentValidation"
           }
         }
@@ -1691,6 +1707,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
     "tags": {
       "value": {
         "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
       }
     }
@@ -1939,7 +1956,6 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
     ]
     diagnosticEventHubAuthorizationRuleId: '<diagnosticEventHubAuthorizationRuleId>'
     diagnosticEventHubName: '<diagnosticEventHubName>'
-    diagnosticLogsRetentionInDays: 7
     diagnosticStorageAccountId: '<diagnosticStorageAccountId>'
     diagnosticWorkspaceId: '<diagnosticWorkspaceId>'
     enableAutomaticUpdates: true
@@ -1949,6 +1965,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
       enabled: true
       tags: {
         Environment: 'Non-Prod'
+        'hidden-title': 'This is visible in the resource name'
         Role: 'DeploymentValidation'
       }
     }
@@ -1971,6 +1988,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
       }
       tags: {
         Environment: 'Non-Prod'
+        'hidden-title': 'This is visible in the resource name'
         Role: 'DeploymentValidation'
       }
     }
@@ -1986,6 +2004,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         ResizeOSDisk: 'false'
         tags: {
           Environment: 'Non-Prod'
+          'hidden-title': 'This is visible in the resource name'
           Role: 'DeploymentValidation'
         }
         VolumeType: 'All'
@@ -2001,6 +2020,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
       ]
       tags: {
         Environment: 'Non-Prod'
+        'hidden-title': 'This is visible in the resource name'
         Role: 'DeploymentValidation'
       }
     }
@@ -2011,6 +2031,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
       enabled: true
       tags: {
         Environment: 'Non-Prod'
+        'hidden-title': 'This is visible in the resource name'
         Role: 'DeploymentValidation'
       }
     }
@@ -2018,6 +2039,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
       enabled: true
       tags: {
         Environment: 'Non-Prod'
+        'hidden-title': 'This is visible in the resource name'
         Role: 'DeploymentValidation'
       }
     }
@@ -2025,6 +2047,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
       enabled: true
       tags: {
         Environment: 'Non-Prod'
+        'hidden-title': 'This is visible in the resource name'
         Role: 'DeploymentValidation'
       }
     }
@@ -2032,6 +2055,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
       enabled: true
       tags: {
         Environment: 'Non-Prod'
+        'hidden-title': 'This is visible in the resource name'
         Role: 'DeploymentValidation'
       }
     }
@@ -2053,6 +2077,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
     systemAssignedIdentity: true
     tags: {
       Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
     }
     userAssignedIdentities: {
@@ -2195,9 +2220,6 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
     "diagnosticEventHubName": {
       "value": "<diagnosticEventHubName>"
     },
-    "diagnosticLogsRetentionInDays": {
-      "value": 7
-    },
     "diagnosticStorageAccountId": {
       "value": "<diagnosticStorageAccountId>"
     },
@@ -2218,6 +2240,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         "enabled": true,
         "tags": {
           "Environment": "Non-Prod",
+          "hidden-title": "This is visible in the resource name",
           "Role": "DeploymentValidation"
         }
       }
@@ -2242,6 +2265,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         },
         "tags": {
           "Environment": "Non-Prod",
+          "hidden-title": "This is visible in the resource name",
           "Role": "DeploymentValidation"
         }
       }
@@ -2259,6 +2283,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
           "ResizeOSDisk": "false",
           "tags": {
             "Environment": "Non-Prod",
+            "hidden-title": "This is visible in the resource name",
             "Role": "DeploymentValidation"
           },
           "VolumeType": "All"
@@ -2276,6 +2301,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         ],
         "tags": {
           "Environment": "Non-Prod",
+          "hidden-title": "This is visible in the resource name",
           "Role": "DeploymentValidation"
         }
       }
@@ -2290,6 +2316,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         "enabled": true,
         "tags": {
           "Environment": "Non-Prod",
+          "hidden-title": "This is visible in the resource name",
           "Role": "DeploymentValidation"
         }
       }
@@ -2299,6 +2326,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         "enabled": true,
         "tags": {
           "Environment": "Non-Prod",
+          "hidden-title": "This is visible in the resource name",
           "Role": "DeploymentValidation"
         }
       }
@@ -2308,6 +2336,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         "enabled": true,
         "tags": {
           "Environment": "Non-Prod",
+          "hidden-title": "This is visible in the resource name",
           "Role": "DeploymentValidation"
         }
       }
@@ -2317,6 +2346,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
         "enabled": true,
         "tags": {
           "Environment": "Non-Prod",
+          "hidden-title": "This is visible in the resource name",
           "Role": "DeploymentValidation"
         }
       }
@@ -2356,6 +2386,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
     "tags": {
       "value": {
         "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
       }
     },
@@ -2416,6 +2447,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
     name: 'cvmwinatmg'
     tags: {
       Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
     }
   }
@@ -2492,6 +2524,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
     "tags": {
       "value": {
         "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
       }
     }
@@ -2677,6 +2710,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
     name: 'cvmwincmk'
     tags: {
       Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
     }
   }
@@ -2766,6 +2800,7 @@ module virtualMachine './compute/virtual-machine/main.bicep' = {
     "tags": {
       "value": {
         "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
       }
     }

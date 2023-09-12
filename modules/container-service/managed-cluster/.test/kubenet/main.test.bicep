@@ -134,8 +134,7 @@ module testDeployment '../../main.bicep' = {
         vmSize: 'Standard_DS2_v2'
       }
     ]
-    aksClusterNetworkPlugin: 'kubenet'
-    diagnosticLogsRetentionInDays: 7
+    networkPlugin: 'kubenet'
     diagnosticStorageAccountId: diagnosticDependencies.outputs.storageAccountResourceId
     diagnosticWorkspaceId: diagnosticDependencies.outputs.logAnalyticsWorkspaceResourceId
     diagnosticEventHubAuthorizationRuleId: diagnosticDependencies.outputs.eventHubAuthorizationRuleId
@@ -153,6 +152,7 @@ module testDeployment '../../main.bicep' = {
       '${nestedDependencies.outputs.managedIdentityResourceId}': {}
     }
     tags: {
+      'hidden-title': 'This is visible in the resource name'
       Environment: 'Non-Prod'
       Role: 'DeploymentValidation'
     }

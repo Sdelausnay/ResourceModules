@@ -66,7 +66,6 @@ module testDeployment '../../main.bicep' = {
     bandwidthInMbps: 50
     peeringLocation: 'Amsterdam'
     serviceProviderName: 'Equinix'
-    diagnosticLogsRetentionInDays: 7
     diagnosticStorageAccountId: diagnosticDependencies.outputs.storageAccountResourceId
     diagnosticWorkspaceId: diagnosticDependencies.outputs.logAnalyticsWorkspaceResourceId
     diagnosticEventHubAuthorizationRuleId: diagnosticDependencies.outputs.eventHubAuthorizationRuleId
@@ -85,6 +84,7 @@ module testDeployment '../../main.bicep' = {
     skuTier: 'Standard'
     allowClassicOperations: true
     tags: {
+      'hidden-title': 'This is visible in the resource name'
       Environment: 'Non-Prod'
       Role: 'DeploymentValidation'
     }

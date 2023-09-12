@@ -155,11 +155,6 @@ param diagnosticMetricsToEnable array = [
   'AllMetrics'
 ]
 
-@description('Optional. Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely.')
-@minValue(0)
-@maxValue(365)
-param diagnosticLogsRetentionInDays int = 365
-
 @description('Optional. Resource ID of the diagnostic storage account.')
 param diagnosticStorageAccountId string = ''
 
@@ -190,23 +185,18 @@ param cMKKeyVersion string = ''
 @description('Conditional. User assigned identity to use when fetching the customer managed key. Note, CMK requires the \'acrSku\' to be \'Premium\'. Required if \'cMKKeyName\' is not empty.')
 param cMKUserAssignedIdentityResourceId string = ''
 
+@description('Optional. Array of Cache Rules. Note: This is a preview feature ([ref](https://learn.microsoft.com/en-us/azure/container-registry/tutorial-registry-cache#cache-for-acr-preview)).')
+param cacheRules array = []
+
 var diagnosticsLogsSpecified = [for category in filter(diagnosticLogCategoriesToEnable, item => item != 'allLogs' && item != ''): {
   category: category
   enabled: true
-  retentionPolicy: {
-    enabled: true
-    days: diagnosticLogsRetentionInDays
-  }
 }]
 
 var diagnosticsLogs = contains(diagnosticLogCategoriesToEnable, 'allLogs') ? [
   {
     categoryGroup: 'allLogs'
     enabled: true
-    retentionPolicy: {
-      enabled: true
-      days: diagnosticLogsRetentionInDays
-    }
   }
 ] : contains(diagnosticLogCategoriesToEnable, '') ? [] : diagnosticsLogsSpecified
 
@@ -214,10 +204,6 @@ var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
   category: metric
   timeGrain: null
   enabled: true
-  retentionPolicy: {
-    enabled: true
-    days: diagnosticLogsRetentionInDays
-  }
 }]
 
 var identityType = systemAssignedIdentity ? (!empty(userAssignedIdentities) ? 'SystemAssigned,UserAssigned' : 'SystemAssigned') : (!empty(userAssignedIdentities) ? 'UserAssigned' : 'None')
@@ -251,7 +237,7 @@ resource cMKKeyVaultKey 'Microsoft.KeyVault/vaults/keys@2021-10-01' existing = i
   scope: resourceGroup(split(cMKKeyVaultResourceId, '/')[2], split(cMKKeyVaultResourceId, '/')[4])
 }
 
-resource registry 'Microsoft.ContainerRegistry/registries@2022-02-01-preview' = {
+resource registry 'Microsoft.ContainerRegistry/registries@2023-06-01-preview' = {
   name: name
   location: location
   identity: identity
@@ -316,6 +302,18 @@ module registry_replications 'replication/main.bicep' = [for (replication, index
   }
 }]
 
+module registry_cacheRules 'cache-rules/main.bicep' = [for (cacheRule, index) in cacheRules: {
+  name: '${uniqueString(deployment().name, location)}-Registry-Cache-${index}'
+  params: {
+    registryName: registry.name
+    sourceRepository: cacheRule.sourceRepository
+    name: contains(cacheRule, 'name') ? cacheRule.name : replace(replace(cacheRule.sourceRepository, '/', '-'), '.', '-')
+    targetRepository: contains(cacheRule, 'targetRepository') ? cacheRule.targetRepository : cacheRule.sourceRepository
+    credentialSetResourceId: contains(cacheRule, 'credentialSetResourceId') ? cacheRule.credentialSetResourceId : ''
+    enableDefaultTelemetry: enableReferencedModulesTelemetry
+  }
+}]
+
 module registry_webhooks 'webhook/main.bicep' = [for (webhook, index) in webhooks: {
   name: '${uniqueString(deployment().name, location)}-Registry-Webhook-${index}'
   params: {
@@ -334,6 +332,7 @@ module registry_webhooks 'webhook/main.bicep' = [for (webhook, index) in webhook
     status: contains(webhook, 'status') ? webhook.status : 'enabled'
     serviceUri: webhook.serviceUri
     tags: contains(webhook, 'tags') ? webhook.tags : {}
+    enableDefaultTelemetry: enableReferencedModulesTelemetry
   }
 }]
 
@@ -382,7 +381,7 @@ module registry_privateEndpoints '../../network/private-endpoint/main.bicep' = [
     serviceResourceId: registry.id
     subnetResourceId: privateEndpoint.subnetResourceId
     enableDefaultTelemetry: enableReferencedModulesTelemetry
-    location: reference(split(privateEndpoint.subnetResourceId, '/subnets/')[0], '2020-06-01', 'Full').location
+    location: contains(privateEndpoint, 'location') ? privateEndpoint.location : reference(split(privateEndpoint.subnetResourceId, '/subnets/')[0], '2020-06-01', 'Full').location
     lock: contains(privateEndpoint, 'lock') ? privateEndpoint.lock : lock
     privateDnsZoneGroup: contains(privateEndpoint, 'privateDnsZoneGroup') ? privateEndpoint.privateDnsZoneGroup : {}
     roleAssignments: contains(privateEndpoint, 'roleAssignments') ? privateEndpoint.roleAssignments : []

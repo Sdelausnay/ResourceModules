@@ -8,7 +8,7 @@ targetScope = 'subscription'
 param resourceGroupName string = 'ms.purview-${serviceShort}-rg'
 
 @description('Optional. The location to deploy resources to.')
-param location string = deployment().location
+param location string = 'eastus' // Only available in selected locations: eastus, eastus2, southcentralus, westcentralus, westus, westus2, westus3
 
 @description('Optional. A short identifier for the kind of deployment. Should be kept short to not run into resource-name length-constraints.')
 param serviceShort string = 'pvacom'
@@ -65,6 +65,7 @@ module testDeployment '../../main.bicep' = {
     name: '${namePrefix}${serviceShort}001'
     location: location
     tags: {
+      'hidden-title': 'This is visible in the resource name'
       Environment: 'Non-Prod'
       Role: 'DeploymentValidation'
     }
@@ -73,7 +74,6 @@ module testDeployment '../../main.bicep' = {
     }
     managedResourceGroupName: '${namePrefix}${serviceShort}001-managed-rg'
     publicNetworkAccess: 'Disabled'
-    diagnosticLogsRetentionInDays: 7
     diagnosticStorageAccountId: diagnosticDependencies.outputs.storageAccountResourceId
     diagnosticWorkspaceId: diagnosticDependencies.outputs.logAnalyticsWorkspaceResourceId
     diagnosticEventHubAuthorizationRuleId: diagnosticDependencies.outputs.eventHubAuthorizationRuleId
@@ -97,6 +97,7 @@ module testDeployment '../../main.bicep' = {
         service: 'account'
         subnetResourceId: nestedDependencies.outputs.subnetResourceId
         tags: {
+          'hidden-title': 'This is visible in the resource name'
           Environment: 'Non-Prod'
           Role: 'DeploymentValidation'
         }
@@ -112,6 +113,7 @@ module testDeployment '../../main.bicep' = {
         service: 'portal'
         subnetResourceId: nestedDependencies.outputs.subnetResourceId
         tags: {
+          'hidden-title': 'This is visible in the resource name'
           Environment: 'Non-Prod'
           Role: 'DeploymentValidation'
         }
@@ -127,6 +129,7 @@ module testDeployment '../../main.bicep' = {
         service: 'blob'
         subnetResourceId: nestedDependencies.outputs.subnetResourceId
         tags: {
+          'hidden-title': 'This is visible in the resource name'
           Environment: 'Non-Prod'
           Role: 'DeploymentValidation'
         }
@@ -142,6 +145,7 @@ module testDeployment '../../main.bicep' = {
         service: 'queue'
         subnetResourceId: nestedDependencies.outputs.subnetResourceId
         tags: {
+          'hidden-title': 'This is visible in the resource name'
           Environment: 'Non-Prod'
           Role: 'DeploymentValidation'
         }
@@ -157,6 +161,7 @@ module testDeployment '../../main.bicep' = {
         service: 'namespace'
         subnetResourceId: nestedDependencies.outputs.subnetResourceId
         tags: {
+          'hidden-title': 'This is visible in the resource name'
           Environment: 'Non-Prod'
           Role: 'DeploymentValidation'
         }

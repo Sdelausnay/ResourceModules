@@ -18,9 +18,9 @@ This module deploys a Virtual Network (vNet).
 | `Microsoft.Authorization/locks` | [2020-05-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2020-05-01/locks) |
 | `Microsoft.Authorization/roleAssignments` | [2022-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2022-04-01/roleAssignments) |
 | `Microsoft.Insights/diagnosticSettings` | [2021-05-01-preview](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Insights/2021-05-01-preview/diagnosticSettings) |
-| `Microsoft.Network/virtualNetworks` | [2022-07-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2022-07-01/virtualNetworks) |
-| `Microsoft.Network/virtualNetworks/subnets` | [2022-07-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2022-07-01/virtualNetworks/subnets) |
-| `Microsoft.Network/virtualNetworks/virtualNetworkPeerings` | [2022-07-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2022-07-01/virtualNetworks/virtualNetworkPeerings) |
+| `Microsoft.Network/virtualNetworks` | [2023-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2023-04-01/virtualNetworks) |
+| `Microsoft.Network/virtualNetworks/subnets` | [2023-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2023-04-01/virtualNetworks/subnets) |
+| `Microsoft.Network/virtualNetworks/virtualNetworkPeerings` | [2023-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2023-04-01/virtualNetworks/virtualNetworkPeerings) |
 
 ## Parameters
 
@@ -39,7 +39,6 @@ This module deploys a Virtual Network (vNet).
 | `diagnosticEventHubAuthorizationRuleId` | string | `''` |  | Resource ID of the diagnostic event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to. |
 | `diagnosticEventHubName` | string | `''` |  | Name of the diagnostic event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category. |
 | `diagnosticLogCategoriesToEnable` | array | `[allLogs]` | `['', allLogs, VMProtectionAlerts]` | The name of logs that will be streamed. "allLogs" includes all possible logs for the resource. Set to '' to disable log collection. |
-| `diagnosticLogsRetentionInDays` | int | `365` |  | Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely. |
 | `diagnosticMetricsToEnable` | array | `[AllMetrics]` | `[AllMetrics]` | The name of metrics that will be streamed. |
 | `diagnosticSettingsName` | string | `''` |  | The name of the diagnostic setting, if deployed. If left empty, it defaults to "<resourceName>-diagnosticSettings". |
 | `diagnosticStorageAccountId` | string | `''` |  | Resource ID of the diagnostic storage account. |
@@ -59,7 +58,7 @@ This module deploys a Virtual Network (vNet).
 
 ### Parameter Usage: `subnets`
 
-Below you can find an example for the subnet property's usage. For all remaining properties, please refer to the _[subnets](subnets/README.md)_ readme.
+Below you can find an example for the subnet property's usage. For all remaining properties, please refer to the _[subnet](subnet/README.md)_ readme.
 
 <details>
 
@@ -144,7 +143,7 @@ subnets: [
 
 ### Parameter Usage: `virtualNetworkPeerings`
 
-As the virtual network peering array allows you to deploy not only a one-way but also two-way peering (i.e reverse), you can use the following ***additional*** properties on top of what is documented in _[virtualNetworkPeerings](virtual-network-peerings/README.md)_.
+As the virtual network peering array allows you to deploy not only a one-way but also two-way peering (i.e reverse), you can use the following ***additional*** properties on top of what is documented in _[virtualNetworkPeering](virtual-network-peering/README.md)_.
 
 | Parameter Name | Type | Default Value | Possible Values | Description |
 | :-- | :-- | :-- | :-- | :-- |
@@ -376,13 +375,12 @@ module virtualNetwork './network/virtual-network/main.bicep' = {
   params: {
     // Required parameters
     addressPrefixes: [
-      '10.0.0.0/16'
+      '<addressPrefix>'
     ]
     name: 'nvncom001'
     // Non-required parameters
     diagnosticEventHubAuthorizationRuleId: '<diagnosticEventHubAuthorizationRuleId>'
     diagnosticEventHubName: '<diagnosticEventHubName>'
-    diagnosticLogsRetentionInDays: 7
     diagnosticStorageAccountId: '<diagnosticStorageAccountId>'
     diagnosticWorkspaceId: '<diagnosticWorkspaceId>'
     dnsServers: [
@@ -403,11 +401,11 @@ module virtualNetwork './network/virtual-network/main.bicep' = {
     ]
     subnets: [
       {
-        addressPrefix: '10.0.255.0/24'
+        addressPrefix: '<addressPrefix>'
         name: 'GatewaySubnet'
       }
       {
-        addressPrefix: '10.0.0.0/24'
+        addressPrefix: '<addressPrefix>'
         name: 'az-subnet-x-001'
         networkSecurityGroupId: '<networkSecurityGroupId>'
         roleAssignments: [
@@ -430,7 +428,7 @@ module virtualNetwork './network/virtual-network/main.bicep' = {
         ]
       }
       {
-        addressPrefix: '10.0.3.0/24'
+        addressPrefix: '<addressPrefix>'
         delegations: [
           {
             name: 'netappDel'
@@ -442,7 +440,7 @@ module virtualNetwork './network/virtual-network/main.bicep' = {
         name: 'az-subnet-x-002'
       }
       {
-        addressPrefix: '10.0.6.0/24'
+        addressPrefix: '<addressPrefix>'
         name: 'az-subnet-x-003'
         privateEndpointNetworkPolicies: 'Disabled'
         privateLinkServiceNetworkPolicies: 'Enabled'
@@ -450,6 +448,7 @@ module virtualNetwork './network/virtual-network/main.bicep' = {
     ]
     tags: {
       Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
     }
   }
@@ -471,7 +470,7 @@ module virtualNetwork './network/virtual-network/main.bicep' = {
     // Required parameters
     "addressPrefixes": {
       "value": [
-        "10.0.0.0/16"
+        "<addressPrefix>"
       ]
     },
     "name": {
@@ -483,9 +482,6 @@ module virtualNetwork './network/virtual-network/main.bicep' = {
     },
     "diagnosticEventHubName": {
       "value": "<diagnosticEventHubName>"
-    },
-    "diagnosticLogsRetentionInDays": {
-      "value": 7
     },
     "diagnosticStorageAccountId": {
       "value": "<diagnosticStorageAccountId>"
@@ -522,11 +518,11 @@ module virtualNetwork './network/virtual-network/main.bicep' = {
     "subnets": {
       "value": [
         {
-          "addressPrefix": "10.0.255.0/24",
+          "addressPrefix": "<addressPrefix>",
           "name": "GatewaySubnet"
         },
         {
-          "addressPrefix": "10.0.0.0/24",
+          "addressPrefix": "<addressPrefix>",
           "name": "az-subnet-x-001",
           "networkSecurityGroupId": "<networkSecurityGroupId>",
           "roleAssignments": [
@@ -549,7 +545,7 @@ module virtualNetwork './network/virtual-network/main.bicep' = {
           ]
         },
         {
-          "addressPrefix": "10.0.3.0/24",
+          "addressPrefix": "<addressPrefix>",
           "delegations": [
             {
               "name": "netappDel",
@@ -561,7 +557,7 @@ module virtualNetwork './network/virtual-network/main.bicep' = {
           "name": "az-subnet-x-002"
         },
         {
-          "addressPrefix": "10.0.6.0/24",
+          "addressPrefix": "<addressPrefix>",
           "name": "az-subnet-x-003",
           "privateEndpointNetworkPolicies": "Disabled",
           "privateLinkServiceNetworkPolicies": "Enabled"
@@ -571,6 +567,7 @@ module virtualNetwork './network/virtual-network/main.bicep' = {
     "tags": {
       "value": {
         "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
       }
     }
@@ -672,6 +669,7 @@ module virtualNetwork './network/virtual-network/main.bicep' = {
     ]
     tags: {
       Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
     }
   }
@@ -729,6 +727,7 @@ module virtualNetwork './network/virtual-network/main.bicep' = {
     "tags": {
       "value": {
         "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
       }
     }

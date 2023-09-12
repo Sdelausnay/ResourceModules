@@ -91,7 +91,6 @@ module testDeployment '../../main.bicep' = {
         name: '${namePrefix}-${serviceShort}-db-001'
       }
     ]
-    diagnosticLogsRetentionInDays: 7
     diagnosticStorageAccountId: diagnosticDependencies.outputs.storageAccountResourceId
     diagnosticWorkspaceId: diagnosticDependencies.outputs.logAnalyticsWorkspaceResourceId
     diagnosticEventHubAuthorizationRuleId: diagnosticDependencies.outputs.eventHubAuthorizationRuleId
@@ -147,6 +146,7 @@ module testDeployment '../../main.bicep' = {
       recurringScansIsEnabled: true
       storageAccountResourceId: diagnosticDependencies.outputs.storageAccountResourceId
       tags: {
+        'hidden-title': 'This is visible in the resource name'
         Environment: 'Non-Prod'
         Role: 'DeploymentValidation'
       }

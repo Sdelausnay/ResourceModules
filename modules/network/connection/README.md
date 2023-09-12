@@ -15,7 +15,7 @@ This module deploys a Virtual Network Gateway Connection.
 | Resource Type | API Version |
 | :-- | :-- |
 | `Microsoft.Authorization/locks` | [2020-05-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2020-05-01/locks) |
-| `Microsoft.Network/connections` | [2022-07-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2022-07-01/connections) |
+| `Microsoft.Network/connections` | [2023-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2023-04-01/connections) |
 
 ## Parameters
 
@@ -345,6 +345,7 @@ module connection './network/connection/main.bicep' = {
     lock: 'CanNotDelete'
     tags: {
       Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
     }
     virtualNetworkGateway2: {
@@ -392,6 +393,7 @@ module connection './network/connection/main.bicep' = {
     "tags": {
       "value": {
         "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
       }
     },

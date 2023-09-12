@@ -1,4 +1,5 @@
 ﻿#requires -version 7.3
+#requires -Modules powershell-yaml
 
 <#
 .SYNOPSIS
@@ -492,13 +493,12 @@ Mandatory. The JSON parameters block to process (ideally already without 'value'
 Mandatory. A list of all required top-level (i.e. non-nested) parameter names
 
 .EXAMPLE
-Get-OrderedParametersJSON -RequiredParametersList @('name') -ParametersJSON '{ "diagnosticLogsRetentionInDays": 7,"lock": "CanNotDelete","name": "carml" }'
+Get-OrderedParametersJSON -RequiredParametersList @('name') -ParametersJSON '{ "lock": "CanNotDelete","name": "carml" }'
 
 Order the given JSON object alphabetically. Would result into:
 
 @{
     name: 'carml'
-    diagnosticLogsRetentionInDays: 7
     lock: 'CanNotDelete'
 }
 #>
@@ -551,7 +551,7 @@ Mandatory. The parameter JSON object to process
 Mandatory. A list of all required top-level (i.e. non-nested) parameter names
 
 .EXAMPLE
-Build-OrderedJSONObject -RequiredParametersList @('name') -ParametersJSON '{ "lock": { "value": "CanNotDelete" }, "name": { "value": "carml" }, "diagnosticLogsRetentionInDays": { "value": 7 } }'
+Build-OrderedJSONObject -RequiredParametersList @('name') -ParametersJSON '{ "lock": { "value": "CanNotDelete" }, "name": { "value": "carml" } }'
 
 Build a formatted Parameter-JSON object with one required parameter. Would result into:
 
@@ -564,9 +564,6 @@ Build a formatted Parameter-JSON object with one required parameter. Would resul
             "value": "carml"
         },
         // Non-required parameters
-        "diagnosticLogsRetentionInDays": {
-            "value": 7
-        },
         "lock": {
             "value": "CanNotDelete"
         }
@@ -734,6 +731,9 @@ function ConvertTo-FormattedJSONParameterObject {
             if ($line -notlike '*"*"*' -and $line -like '*.*') {
                 # In case of a array value like '[ \n -> resourceGroupResources.outputs.managedIdentityPrincipalId <- \n ]' we'll only show "<managedIdentityPrincipalId>""
                 $line = '"<{0}>"' -f $line.Split('.')[-1].Trim()
+            } elseif ($line -match '^\s*[a-zA-Z]+\s*$') {
+                # If there is simply only a value such as a variable reference, we'll wrap it as a string to replace. For example a reference of a variable `addressPrefix` will be replaced with `"<addressPrefix>"`
+                $line = '"<{0}>"' -f $line.Trim()
             }
         }
 
@@ -792,7 +792,6 @@ Convert the given JSONParameters object with one required parameter to a formatt
     // Required parameters
     name: 'carml'
     // Non-required parameters
-    diagnosticLogsRetentionInDays: 7
     lock: 'CanNotDelete'
 '
 #>
@@ -1405,7 +1404,7 @@ Initialize the readme of the 'sql/managed-instance/administrator' module
 #>
 function Initialize-ReadMe {
 
-    [CmdletBinding(SupportsShouldProcess)]
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
         [string] $ReadMeFilePath,
@@ -1417,11 +1416,11 @@ function Initialize-ReadMe {
         [hashtable] $TemplateFileContent
     )
 
-    . (Join-Path $PSScriptRoot 'helper' 'ConvertTo-ModuleResourceType.ps1')
+    . (Join-Path $PSScriptRoot 'helper' 'Get-SpecsAlignedResourceName.ps1')
 
     $moduleName = $TemplateFileContent.metadata.name
     $moduleDescription = $TemplateFileContent.metadata.description
-    $formattedResourceType = ConvertTo-ModuleResourceType -ResourceIdentifier $FullModuleIdentifier
+    $formattedResourceType = Get-SpecsAlignedResourceName -ResourceIdentifier $FullModuleIdentifier
 
     if (-not (Test-Path $ReadMeFilePath) -or ([String]::IsNullOrEmpty((Get-Content $ReadMeFilePath -Raw)))) {
 
@@ -1580,7 +1579,7 @@ function Set-ModuleReadMe {
     }
 
     $moduleRoot = Split-Path $TemplateFilePath -Parent
-    $fullModuleIdentifier = $moduleRoot.Replace('\', '/').split('modules/')[1]
+    $fullModuleIdentifier = $moduleRoot.Replace('\', '/').split('modules/')[-1]
     # Custom modules are modules having the same resource type but different properties based on the name
     # E.g., web/site/config--appsetting vs web/site/config--authsettingv2
     $customModuleSeparator = '--'

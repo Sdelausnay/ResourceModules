@@ -18,8 +18,8 @@ This module deploys a Storage Account.
 | `Microsoft.Authorization/locks` | [2020-05-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2020-05-01/locks) |
 | `Microsoft.Authorization/roleAssignments` | [2022-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2022-04-01/roleAssignments) |
 | `Microsoft.Insights/diagnosticSettings` | [2021-05-01-preview](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Insights/2021-05-01-preview/diagnosticSettings) |
-| `Microsoft.Network/privateEndpoints` | [2022-07-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2022-07-01/privateEndpoints) |
-| `Microsoft.Network/privateEndpoints/privateDnsZoneGroups` | [2022-07-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2022-07-01/privateEndpoints/privateDnsZoneGroups) |
+| `Microsoft.Network/privateEndpoints` | [2023-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2023-04-01/privateEndpoints) |
+| `Microsoft.Network/privateEndpoints/privateDnsZoneGroups` | [2023-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2023-04-01/privateEndpoints/privateDnsZoneGroups) |
 | `Microsoft.Storage/storageAccounts` | [2022-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Storage/2022-09-01/storageAccounts) |
 | `Microsoft.Storage/storageAccounts/blobServices` | [2022-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Storage/2022-09-01/storageAccounts/blobServices) |
 | `Microsoft.Storage/storageAccounts/blobServices/containers` | [2022-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Storage/2022-09-01/storageAccounts/blobServices/containers) |
@@ -27,7 +27,7 @@ This module deploys a Storage Account.
 | `Microsoft.Storage/storageAccounts/fileServices` | [2021-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Storage/2021-09-01/storageAccounts/fileServices) |
 | `Microsoft.Storage/storageAccounts/fileServices/shares` | [2021-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Storage/2021-09-01/storageAccounts/fileServices/shares) |
 | `Microsoft.Storage/storageAccounts/localUsers` | [2022-05-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Storage/2022-05-01/storageAccounts/localUsers) |
-| `Microsoft.Storage/storageAccounts/managementPolicies` | [2021-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Storage/2021-09-01/storageAccounts/managementPolicies) |
+| `Microsoft.Storage/storageAccounts/managementPolicies` | [2023-01-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Storage/storageAccounts/managementPolicies) |
 | `Microsoft.Storage/storageAccounts/queueServices` | [2021-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Storage/2021-09-01/storageAccounts/queueServices) |
 | `Microsoft.Storage/storageAccounts/queueServices/queues` | [2021-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Storage/2021-09-01/storageAccounts/queueServices/queues) |
 | `Microsoft.Storage/storageAccounts/tableServices` | [2021-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Storage/2021-09-01/storageAccounts/tableServices) |
@@ -67,7 +67,6 @@ This module deploys a Storage Account.
 | `defaultToOAuthAuthentication` | bool | `False` |  | A boolean flag which indicates whether the default authentication is OAuth or not. |
 | `diagnosticEventHubAuthorizationRuleId` | string | `''` |  | Resource ID of the diagnostic event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to. |
 | `diagnosticEventHubName` | string | `''` |  | Name of the diagnostic event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category. |
-| `diagnosticLogsRetentionInDays` | int | `365` |  | Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely. |
 | `diagnosticMetricsToEnable` | array | `[Transaction]` | `[Transaction]` | The name of metrics that will be streamed. |
 | `diagnosticSettingsName` | string | `''` |  | The name of the diagnostic setting, if deployed. If left empty, it defaults to "<resourceName>-diagnosticSettings". |
 | `diagnosticStorageAccountId` | string | `''` |  | Resource ID of the diagnostic storage account. |
@@ -468,13 +467,12 @@ module storageAccount './storage/storage-account/main.bicep' = {
       deleteRetentionPolicyEnabled: true
       diagnosticEventHubAuthorizationRuleId: '<diagnosticEventHubAuthorizationRuleId>'
       diagnosticEventHubName: '<diagnosticEventHubName>'
-      diagnosticLogsRetentionInDays: 7
       diagnosticStorageAccountId: '<diagnosticStorageAccountId>'
       diagnosticWorkspaceId: '<diagnosticWorkspaceId>'
+      lastAccessTimeTrackingPolicyEnabled: true
     }
     diagnosticEventHubAuthorizationRuleId: '<diagnosticEventHubAuthorizationRuleId>'
     diagnosticEventHubName: '<diagnosticEventHubName>'
-    diagnosticLogsRetentionInDays: 7
     diagnosticStorageAccountId: '<diagnosticStorageAccountId>'
     diagnosticWorkspaceId: '<diagnosticWorkspaceId>'
     enableDefaultTelemetry: '<enableDefaultTelemetry>'
@@ -484,7 +482,6 @@ module storageAccount './storage/storage-account/main.bicep' = {
     fileServices: {
       diagnosticEventHubAuthorizationRuleId: '<diagnosticEventHubAuthorizationRuleId>'
       diagnosticEventHubName: '<diagnosticEventHubName>'
-      diagnosticLogsRetentionInDays: 7
       diagnosticStorageAccountId: '<diagnosticStorageAccountId>'
       diagnosticWorkspaceId: '<diagnosticWorkspaceId>'
       shares: [
@@ -527,6 +524,40 @@ module storageAccount './storage/storage-account/main.bicep' = {
       }
     ]
     lock: 'CanNotDelete'
+    managementPolicyRules: [
+      {
+        definition: {
+          actions: {
+            baseBlob: {
+              delete: {
+                daysAfterModificationGreaterThan: 30
+              }
+              tierToCool: {
+                daysAfterLastAccessTimeGreaterThan: 5
+              }
+            }
+          }
+          filters: {
+            blobIndexMatch: [
+              {
+                name: 'BlobIndex'
+                op: '=='
+                value: '1'
+              }
+            ]
+            blobTypes: [
+              'blockBlob'
+            ]
+            prefixMatch: [
+              'sample-container/log'
+            ]
+          }
+        }
+        enabled: true
+        name: 'FirstRule'
+        type: 'Lifecycle'
+      }
+    ]
     networkAcls: {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
@@ -554,6 +585,7 @@ module storageAccount './storage/storage-account/main.bicep' = {
         subnetResourceId: '<subnetResourceId>'
         tags: {
           Environment: 'Non-Prod'
+          'hidden-title': 'This is visible in the resource name'
           Role: 'DeploymentValidation'
         }
       }
@@ -561,7 +593,6 @@ module storageAccount './storage/storage-account/main.bicep' = {
     queueServices: {
       diagnosticEventHubAuthorizationRuleId: '<diagnosticEventHubAuthorizationRuleId>'
       diagnosticEventHubName: '<diagnosticEventHubName>'
-      diagnosticLogsRetentionInDays: 7
       diagnosticStorageAccountId: '<diagnosticStorageAccountId>'
       diagnosticWorkspaceId: '<diagnosticWorkspaceId>'
       queues: [
@@ -603,7 +634,6 @@ module storageAccount './storage/storage-account/main.bicep' = {
     tableServices: {
       diagnosticEventHubAuthorizationRuleId: '<diagnosticEventHubAuthorizationRuleId>'
       diagnosticEventHubName: '<diagnosticEventHubName>'
-      diagnosticLogsRetentionInDays: 7
       diagnosticStorageAccountId: '<diagnosticStorageAccountId>'
       diagnosticWorkspaceId: '<diagnosticWorkspaceId>'
       tables: [
@@ -613,6 +643,7 @@ module storageAccount './storage/storage-account/main.bicep' = {
     }
     tags: {
       Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
     }
     userAssignedIdentities: {
@@ -678,9 +709,9 @@ module storageAccount './storage/storage-account/main.bicep' = {
         "deleteRetentionPolicyEnabled": true,
         "diagnosticEventHubAuthorizationRuleId": "<diagnosticEventHubAuthorizationRuleId>",
         "diagnosticEventHubName": "<diagnosticEventHubName>",
-        "diagnosticLogsRetentionInDays": 7,
         "diagnosticStorageAccountId": "<diagnosticStorageAccountId>",
-        "diagnosticWorkspaceId": "<diagnosticWorkspaceId>"
+        "diagnosticWorkspaceId": "<diagnosticWorkspaceId>",
+        "lastAccessTimeTrackingPolicyEnabled": true
       }
     },
     "diagnosticEventHubAuthorizationRuleId": {
@@ -688,9 +719,6 @@ module storageAccount './storage/storage-account/main.bicep' = {
     },
     "diagnosticEventHubName": {
       "value": "<diagnosticEventHubName>"
-    },
-    "diagnosticLogsRetentionInDays": {
-      "value": 7
     },
     "diagnosticStorageAccountId": {
       "value": "<diagnosticStorageAccountId>"
@@ -714,7 +742,6 @@ module storageAccount './storage/storage-account/main.bicep' = {
       "value": {
         "diagnosticEventHubAuthorizationRuleId": "<diagnosticEventHubAuthorizationRuleId>",
         "diagnosticEventHubName": "<diagnosticEventHubName>",
-        "diagnosticLogsRetentionInDays": 7,
         "diagnosticStorageAccountId": "<diagnosticStorageAccountId>",
         "diagnosticWorkspaceId": "<diagnosticWorkspaceId>",
         "shares": [
@@ -764,6 +791,42 @@ module storageAccount './storage/storage-account/main.bicep' = {
     "lock": {
       "value": "CanNotDelete"
     },
+    "managementPolicyRules": {
+      "value": [
+        {
+          "definition": {
+            "actions": {
+              "baseBlob": {
+                "delete": {
+                  "daysAfterModificationGreaterThan": 30
+                },
+                "tierToCool": {
+                  "daysAfterLastAccessTimeGreaterThan": 5
+                }
+              }
+            },
+            "filters": {
+              "blobIndexMatch": [
+                {
+                  "name": "BlobIndex",
+                  "op": "==",
+                  "value": "1"
+                }
+              ],
+              "blobTypes": [
+                "blockBlob"
+              ],
+              "prefixMatch": [
+                "sample-container/log"
+              ]
+            }
+          },
+          "enabled": true,
+          "name": "FirstRule",
+          "type": "Lifecycle"
+        }
+      ]
+    },
     "networkAcls": {
       "value": {
         "bypass": "AzureServices",
@@ -794,6 +857,7 @@ module storageAccount './storage/storage-account/main.bicep' = {
           "subnetResourceId": "<subnetResourceId>",
           "tags": {
             "Environment": "Non-Prod",
+            "hidden-title": "This is visible in the resource name",
             "Role": "DeploymentValidation"
           }
         }
@@ -803,7 +867,6 @@ module storageAccount './storage/storage-account/main.bicep' = {
       "value": {
         "diagnosticEventHubAuthorizationRuleId": "<diagnosticEventHubAuthorizationRuleId>",
         "diagnosticEventHubName": "<diagnosticEventHubName>",
-        "diagnosticLogsRetentionInDays": 7,
         "diagnosticStorageAccountId": "<diagnosticStorageAccountId>",
         "diagnosticWorkspaceId": "<diagnosticWorkspaceId>",
         "queues": [
@@ -857,7 +920,6 @@ module storageAccount './storage/storage-account/main.bicep' = {
       "value": {
         "diagnosticEventHubAuthorizationRuleId": "<diagnosticEventHubAuthorizationRuleId>",
         "diagnosticEventHubName": "<diagnosticEventHubName>",
-        "diagnosticLogsRetentionInDays": 7,
         "diagnosticStorageAccountId": "<diagnosticStorageAccountId>",
         "diagnosticWorkspaceId": "<diagnosticWorkspaceId>",
         "tables": [
@@ -869,6 +931,7 @@ module storageAccount './storage/storage-account/main.bicep' = {
     "tags": {
       "value": {
         "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
       }
     },
@@ -934,6 +997,7 @@ module storageAccount './storage/storage-account/main.bicep' = {
         subnetResourceId: '<subnetResourceId>'
         tags: {
           Environment: 'Non-Prod'
+          'hidden-title': 'This is visible in the resource name'
           Role: 'DeploymentValidation'
         }
       }
@@ -943,6 +1007,7 @@ module storageAccount './storage/storage-account/main.bicep' = {
     systemAssignedIdentity: false
     tags: {
       Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
     }
     userAssignedIdentities: {
@@ -1019,6 +1084,7 @@ module storageAccount './storage/storage-account/main.bicep' = {
           "subnetResourceId": "<subnetResourceId>",
           "tags": {
             "Environment": "Non-Prod",
+            "hidden-title": "This is visible in the resource name",
             "Role": "DeploymentValidation"
           }
         }
@@ -1036,6 +1102,7 @@ module storageAccount './storage/storage-account/main.bicep' = {
     "tags": {
       "value": {
         "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
       }
     },
@@ -1116,7 +1183,6 @@ module storageAccount './storage/storage-account/main.bicep' = {
     allowBlobPublicAccess: false
     diagnosticEventHubAuthorizationRuleId: '<diagnosticEventHubAuthorizationRuleId>'
     diagnosticEventHubName: '<diagnosticEventHubName>'
-    diagnosticLogsRetentionInDays: 7
     diagnosticStorageAccountId: '<diagnosticStorageAccountId>'
     diagnosticWorkspaceId: '<diagnosticWorkspaceId>'
     enableDefaultTelemetry: '<enableDefaultTelemetry>'
@@ -1144,6 +1210,7 @@ module storageAccount './storage/storage-account/main.bicep' = {
     systemAssignedIdentity: true
     tags: {
       Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
     }
     userAssignedIdentities: {
@@ -1178,9 +1245,6 @@ module storageAccount './storage/storage-account/main.bicep' = {
     },
     "diagnosticEventHubName": {
       "value": "<diagnosticEventHubName>"
-    },
-    "diagnosticLogsRetentionInDays": {
-      "value": 7
     },
     "diagnosticStorageAccountId": {
       "value": "<diagnosticStorageAccountId>"
@@ -1230,6 +1294,7 @@ module storageAccount './storage/storage-account/main.bicep' = {
     "tags": {
       "value": {
         "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
       }
     },
@@ -1263,6 +1328,7 @@ module storageAccount './storage/storage-account/main.bicep' = {
     kind: 'Storage'
     tags: {
       Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
     }
   }
@@ -1298,6 +1364,7 @@ module storageAccount './storage/storage-account/main.bicep' = {
     "tags": {
       "value": {
         "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
       }
     }

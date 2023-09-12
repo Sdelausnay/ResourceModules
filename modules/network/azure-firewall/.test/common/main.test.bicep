@@ -119,7 +119,6 @@ module testDeployment '../../main.bicep' = {
       }
     ]
     publicIPResourceID: nestedDependencies.outputs.publicIPResourceId
-    diagnosticLogsRetentionInDays: 7
     diagnosticStorageAccountId: diagnosticDependencies.outputs.storageAccountResourceId
     diagnosticWorkspaceId: diagnosticDependencies.outputs.logAnalyticsWorkspaceResourceId
     diagnosticEventHubAuthorizationRuleId: diagnosticDependencies.outputs.eventHubAuthorizationRuleId
@@ -169,6 +168,7 @@ module testDeployment '../../main.bicep' = {
       '3'
     ]
     tags: {
+      'hidden-title': 'This is visible in the resource name'
       Environment: 'Non-Prod'
       Role: 'DeploymentValidation'
     }

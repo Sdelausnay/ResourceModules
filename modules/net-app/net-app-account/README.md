@@ -16,9 +16,9 @@ This module deploys an Azure NetApp File.
 | :-- | :-- |
 | `Microsoft.Authorization/locks` | [2020-05-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2020-05-01/locks) |
 | `Microsoft.Authorization/roleAssignments` | [2022-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2022-04-01/roleAssignments) |
-| `Microsoft.NetApp/netAppAccounts` | [2022-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.NetApp/netAppAccounts) |
-| `Microsoft.NetApp/netAppAccounts/capacityPools` | [2022-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.NetApp/netAppAccounts/capacityPools) |
-| `Microsoft.NetApp/netAppAccounts/capacityPools/volumes` | [2022-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.NetApp/netAppAccounts/capacityPools/volumes) |
+| `Microsoft.NetApp/netAppAccounts` | [2022-11-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.NetApp/netAppAccounts) |
+| `Microsoft.NetApp/netAppAccounts/capacityPools` | [2022-11-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.NetApp/netAppAccounts/capacityPools) |
+| `Microsoft.NetApp/netAppAccounts/capacityPools/volumes` | [2022-11-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.NetApp/netAppAccounts/capacityPools/volumes) |
 
 ## Parameters
 
@@ -341,6 +341,7 @@ module netAppAccount './net-app/net-app-account/main.bicep' = {
       Contact: 'test.user@testcompany.com'
       CostCenter: '7890'
       Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
       PurchaseOrder: '1234'
       Role: 'DeploymentValidation'
       ServiceName: 'DeploymentValidation'
@@ -458,6 +459,7 @@ module netAppAccount './net-app/net-app-account/main.bicep' = {
         "Contact": "test.user@testcompany.com",
         "CostCenter": "7890",
         "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
         "PurchaseOrder": "1234",
         "Role": "DeploymentValidation",
         "ServiceName": "DeploymentValidation"
@@ -575,6 +577,7 @@ module netAppAccount './net-app/net-app-account/main.bicep' = {
       Contact: 'test.user@testcompany.com'
       CostCenter: '7890'
       Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
       PurchaseOrder: '1234'
       Role: 'DeploymentValidation'
       ServiceName: 'DeploymentValidation'
@@ -702,6 +705,7 @@ module netAppAccount './net-app/net-app-account/main.bicep' = {
         "Contact": "test.user@testcompany.com",
         "CostCenter": "7890",
         "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
         "PurchaseOrder": "1234",
         "Role": "DeploymentValidation",
         "ServiceName": "DeploymentValidation"

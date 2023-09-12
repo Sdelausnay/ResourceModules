@@ -5,12 +5,33 @@ metadata owner = 'Azure/module-maintainers'
 @description('Required. The name of the PostgreSQL flexible server.')
 param name string
 
-@description('Required. The administrator login name of a server. Can only be specified when the PostgreSQL server is being created.')
-param administratorLogin string
+@description('Optional. The administrator login name of a server. Can only be specified when the PostgreSQL server is being created.')
+param administratorLogin string = ''
 
-@description('Required. The administrator login password.')
+@description('Optional. The administrator login password.')
 @secure()
-param administratorLoginPassword string
+param administratorLoginPassword string = ''
+
+@allowed([
+  'Disabled'
+  'Enabled'
+])
+@description('Optional. If Enabled, Azure Active Directory authentication is enabled.')
+param activeDirectoryAuth string = 'Enabled'
+
+@allowed([
+  'Disabled'
+  'Enabled'
+])
+@description('Optional. If Enabled, password authentication is enabled.')
+#disable-next-line secure-secrets-in-params
+param passwordAuth string = 'Disabled'
+
+@description('Optional. Tenant id of the server.')
+param tenantId string = ''
+
+@description('Optional. The Azure AD administrators when AAD authentication enabled.')
+param administrators array = []
 
 @description('Optional. Location for all resources.')
 param location string = resourceGroup().location
@@ -67,9 +88,10 @@ param storageSizeGB int = 32
   '12'
   '13'
   '14'
+  '15'
 ])
 @description('Optional. PostgreSQL Server version.')
-param version string = '13'
+param version string = '15'
 
 @allowed([
   'Disabled'
@@ -144,11 +166,6 @@ param tags object = {}
 @description('Optional. Enable telemetry via a Globally Unique Identifier (GUID).')
 param enableDefaultTelemetry bool = true
 
-@description('Optional. Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely.')
-@minValue(0)
-@maxValue(365)
-param diagnosticLogsRetentionInDays int = 365
-
 @description('Optional. Resource ID of the diagnostic storage account.')
 param diagnosticStorageAccountId string = ''
 
@@ -190,20 +207,12 @@ param diagnosticSettingsName string = ''
 var diagnosticsLogsSpecified = [for category in filter(diagnosticLogCategoriesToEnable, item => item != 'allLogs' && item != ''): {
   category: category
   enabled: true
-  retentionPolicy: {
-    enabled: true
-    days: diagnosticLogsRetentionInDays
-  }
 }]
 
 var diagnosticsLogs = contains(diagnosticLogCategoriesToEnable, 'allLogs') ? [
   {
     categoryGroup: 'allLogs'
     enabled: true
-    retentionPolicy: {
-      enabled: true
-      days: diagnosticLogsRetentionInDays
-    }
   }
 ] : contains(diagnosticLogCategoriesToEnable, '') ? [] : diagnosticsLogsSpecified
 
@@ -211,10 +220,6 @@ var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
   category: metric
   timeGrain: null
   enabled: true
-  retentionPolicy: {
-    enabled: true
-    days: diagnosticLogsRetentionInDays
-  }
 }]
 
 var enableReferencedModulesTelemetry = false
@@ -249,8 +254,13 @@ resource flexibleServer 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' =
     userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : {}
   }
   properties: {
-    administratorLogin: administratorLogin
-    administratorLoginPassword: administratorLoginPassword
+    administratorLogin: !empty(administratorLogin) ? administratorLogin : null
+    administratorLoginPassword: !empty(administratorLoginPassword) ? administratorLoginPassword : null
+    authConfig: {
+      activeDirectoryAuth: activeDirectoryAuth
+      passwordAuth: passwordAuth
+      tenantId: !empty(tenantId) ? tenantId : null
+    }
     availabilityZone: availabilityZone
     backup: {
       backupRetentionDays: backupRetentionDays
@@ -344,6 +354,17 @@ module flexibleServer_configurations 'configuration/main.bicep' = [for (configur
   dependsOn: [
     flexibleServer_firewallRules
   ]
+}]
+
+module flexibleServer_administrators 'administrator/main.bicep' = [for (administrator, index) in administrators: {
+  name: '${uniqueString(deployment().name, location)}-PostgreSQL-Administrators-${index}'
+  params: {
+    flexibleServerName: flexibleServer.name
+    objectId: administrator.objectId
+    principalName: administrator.principalName
+    principalType: administrator.principalType
+    tenantId: contains(administrator, 'tenantId') ? administrator.tenantId : tenant().tenantId
+  }
 }]
 
 resource flexibleServer_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {

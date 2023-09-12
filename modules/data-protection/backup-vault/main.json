@@ -4,9 +4,12 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.19.5.34762",
-      "templateHash": "1811109282711100098"
-    }
+      "version": "0.20.4.51522",
+      "templateHash": "15185666267532719646"
+    },
+    "name": "Data Protection Backup Vaults",
+    "description": "This module deploys a Data Protection Backup Vault.",
+    "owner": "Azure/module-maintainers"
   },
   "parameters": {
     "name": {
@@ -39,14 +42,14 @@
     "lock": {
       "type": "string",
       "defaultValue": "",
-      "metadata": {
-        "description": "Optional. Specify the type of lock."
-      },
       "allowedValues": [
         "",
         "CanNotDelete",
         "ReadOnly"
-      ]
+      ],
+      "metadata": {
+        "description": "Optional. Specify the type of lock."
+      }
     },
     "systemAssignedIdentity": {
       "type": "bool",
@@ -89,19 +92,33 @@
     "azureMonitorAlertSettingsAlertsForAllJobFailures": {
       "type": "string",
       "defaultValue": "Enabled",
-      "metadata": {
-        "description": "Optional. Settings for Azure Monitor based alerts for job failures."
-      },
       "allowedValues": [
         "Disabled",
         "Enabled"
-      ]
+      ],
+      "metadata": {
+        "description": "Optional. Settings for Azure Monitor based alerts for job failures."
+      }
     },
     "backupPolicies": {
       "type": "array",
       "defaultValue": [],
       "metadata": {
         "description": "Optional. List of all backup policies."
+      }
+    },
+    "securitySettings": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Security settings for the backup vault."
+      }
+    },
+    "featureSettings": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Feature settings for the backup vault."
       }
     }
   },
@@ -127,7 +144,7 @@
     },
     {
       "type": "Microsoft.DataProtection/backupVaults",
-      "apiVersion": "2022-11-01-preview",
+      "apiVersion": "2023-05-01",
       "name": "[parameters('name')]",
       "location": "[parameters('location')]",
       "tags": "[parameters('tags')]",
@@ -143,7 +160,9 @@
             "type": "[parameters('type')]",
             "datastoreType": "[parameters('dataStoreType')]"
           }
-        ]
+        ],
+        "featureSettings": "[parameters('featureSettings')]",
+        "securitySettings": "[parameters('securitySettings')]"
       }
     },
     {
@@ -193,9 +212,12 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.19.5.34762",
-              "templateHash": "15950464845862056522"
-            }
+              "version": "0.20.4.51522",
+              "templateHash": "13351591046039775322"
+            },
+            "name": "Data Protection Backup Vault Backup Policies",
+            "description": "This module deploys a Data Protection Backup Vault Backup Policy.",
+            "owner": "Azure/module-maintainers"
           },
           "parameters": {
             "backupVaultName": {
@@ -243,7 +265,7 @@
             },
             {
               "type": "Microsoft.DataProtection/backupVaults/backupPolicies",
-              "apiVersion": "2022-11-01-preview",
+              "apiVersion": "2023-05-01",
               "name": "[format('{0}/{1}', parameters('backupVaultName'), parameters('name'))]",
               "properties": "[parameters('properties')]"
             }
@@ -311,8 +333,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.19.5.34762",
-              "templateHash": "7094311822465776729"
+              "version": "0.20.4.51522",
+              "templateHash": "10253116074794957898"
             }
           },
           "parameters": {
@@ -456,14 +478,14 @@
       "metadata": {
         "description": "The principal ID of the system assigned identity."
       },
-      "value": "[if(and(parameters('systemAssignedIdentity'), contains(reference(resourceId('Microsoft.DataProtection/backupVaults', parameters('name')), '2022-11-01-preview', 'full').identity, 'principalId')), reference(resourceId('Microsoft.DataProtection/backupVaults', parameters('name')), '2022-11-01-preview', 'full').identity.principalId, '')]"
+      "value": "[if(and(parameters('systemAssignedIdentity'), contains(reference(resourceId('Microsoft.DataProtection/backupVaults', parameters('name')), '2023-05-01', 'full').identity, 'principalId')), reference(resourceId('Microsoft.DataProtection/backupVaults', parameters('name')), '2023-05-01', 'full').identity.principalId, '')]"
     },
     "location": {
       "type": "string",
       "metadata": {
         "description": "The location the resource was deployed into."
       },
-      "value": "[reference(resourceId('Microsoft.DataProtection/backupVaults', parameters('name')), '2022-11-01-preview', 'full').location]"
+      "value": "[reference(resourceId('Microsoft.DataProtection/backupVaults', parameters('name')), '2023-05-01', 'full').location]"
     }
   }
 }

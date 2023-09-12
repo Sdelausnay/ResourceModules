@@ -26,7 +26,7 @@ The following activities are performed by the [`utilities/pipelines/staticValida
     1. Module should contain a [` version.json `] file.
   - **.test folder**
     1. Folder should contain one or more test files.
-    1. JSON test files in the `.test` folder should be valid JSON.
+    1. JSON test files in the `.test` folder should be valid json.
 - **Pipeline tests**
     1. Module should have a GitHub workflow.
     1. Module workflow should have trigger for cross-module references, if any.
@@ -77,9 +77,6 @@ The following activities are performed by the [`utilities/pipelines/staticValida
     1. JSON test deployment should have parameter [`serviceShort`].
   - **Token usage**
     1. [Tokens] Test file should not contain the plain value for token guid.
-  - **Public Bicep Registry tests**
-    1. Module should have central test file [.test/main.test.bicep] for Public Bicep Registry CI
-    1. Module
 - **API version tests**
     1. In used resource type should use one of the recent API version(s). Currently using .
 
